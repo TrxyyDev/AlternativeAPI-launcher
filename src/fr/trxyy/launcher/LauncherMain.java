@@ -1,5 +1,6 @@
 package fr.trxyy.launcher;
 
+import fr.trxyy.alternative.alternative_api.GameArguments;
 import fr.trxyy.alternative.alternative_api.GameConnect;
 import fr.trxyy.alternative.alternative_api.GameEngine;
 import fr.trxyy.alternative.alternative_api.GameFolder;
@@ -28,7 +29,7 @@ public class LauncherMain extends AlternativeBase {
 	/** ===================== CONNEXION AUTO SERVEUR ===================== */
 	private static GameConnect DIRECT_CONNECT = new GameConnect("funcraft.net", "25565");
 	/** ===================== ARGUMENTS SUPPLEMENTAIRES ===================== */
-//	private static GameArguments CUSTOM_ARGUMENTS = new GameArguments(new String[] {"--customArg", "something"});
+	private static GameArguments CUSTOM_ARGUMENTS = new GameArguments(new String[] {"--customArg", "something"});
 	/** ===================== MAINTENANCE ===================== */
 	private static GameMaintenance MAINTENANCE = new GameMaintenance(Maintenance.DONT_USE, GAME_ENGINE);
 	/** ===================== URL DU FICHIER JSON ===================== */
@@ -37,7 +38,7 @@ public class LauncherMain extends AlternativeBase {
 	public static void main(String[] args) {
 		GAME_ENGINE.reg(LINKS);
 		GAME_ENGINE.reg(MAINTENANCE);
-		GAME_ENGINE.reg(DIRECT_CONNECT);
+//		GAME_ENGINE.reg(DIRECT_CONNECT);
 //		GAME_ENGINE.reg(CUSTOM_ARGUMENTS);
 		launch(args);
 	}
