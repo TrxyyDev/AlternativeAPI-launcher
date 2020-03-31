@@ -1,2 +1,2 @@
-# AlternativeAPI-launcher
-Launcher Template for AlternativeAPI Library
+# AlternativeAPI|Launcher
+![Logo](https://trxyy.chaun14.fr/github/AlternativeAPI_logo.png)
