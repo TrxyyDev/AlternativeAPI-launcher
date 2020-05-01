@@ -4,13 +4,15 @@ import fr.trxyy.alternative.alternative_api.GameEngine;
 import fr.trxyy.alternative.alternative_api.GameSize;
 import fr.trxyy.alternative.alternative_api.utils.FontLoader;
 import fr.trxyy.alternative.alternative_api.utils.Logger;
-import fr.trxyy.alternative.alternative_api_ui.IScreen;
-import fr.trxyy.alternative.alternative_api_ui.LauncherButton;
-import fr.trxyy.alternative.alternative_api_ui.LauncherLabel;
-import fr.trxyy.alternative.alternative_api_ui.LauncherRectangle;
+import fr.trxyy.alternative.alternative_api_ui.base.IScreen;
+import fr.trxyy.alternative.alternative_api_ui.components.LauncherButton;
+import fr.trxyy.alternative.alternative_api_ui.components.LauncherLabel;
+import fr.trxyy.alternative.alternative_api_ui.components.LauncherRectangle;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
@@ -27,7 +29,7 @@ public class LauncherSettings extends IScreen {
 	private LauncherLabel windowsSizeLabel;
 	private ComboBox<String> windowsSizeList;
 	
-	public LauncherSettings(Pane root, GameEngine engine, LauncherPanel pane) {
+	public LauncherSettings(final Pane root, final GameEngine engine, final LauncherPanel pane) {
 		this.drawBackgroundImage(engine, root, "background.png");
 		pane.userConfig.readConfig();
 		engine.reg(pane.userConfig.convertMemory(pane.userConfig.getMemory()));
@@ -51,7 +53,7 @@ public class LauncherSettings extends IScreen {
 		this.windowsSizeLabel.setSize(370, 30);
 		this.windowsSizeLabel.setPosition(50, 60);
 		/** ===================== MC SIZE LIST ===================== */
-		this.windowsSizeList = new ComboBox<>();
+		this.windowsSizeList = new ComboBox<String>();
 		this.populateSizeList();
 		if (pane.userConfig.getWindowSize() != null) {
 			this.windowsSizeList.setValue(pane.userConfig.getWindowSize());
@@ -88,8 +90,11 @@ public class LauncherSettings extends IScreen {
 		this.memorySlider.setLayoutY(140);
 		this.memorySlider.setPrefWidth(395);
 		this.memorySlider.setBlockIncrement(1);
-		this.memorySlider.valueProperty().addListener((obs, oldval, newVal) ->
-		this.memorySlider.setValue(Math.round(newVal.doubleValue())));
+		memorySlider.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov, Number old_val, Number new_val) {
+                    memorySlider.setValue(Math.round(new_val.doubleValue()));
+            }
+        });
 		this.memorySlider.valueProperty().addListener(new ChangeListener<Number>() {
 	         @Override
 	         public void changed(ObservableValue<? extends Number> observable,
@@ -97,7 +102,12 @@ public class LauncherSettings extends IScreen {
 	        	 memorySliderLabel.setText(newValue + "Gb");
 	         }
 	      });
-		Platform.runLater(() -> root.getChildren().add(this.memorySlider));
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	 root.getChildren().add(memorySlider);
+            }
+        });
 		
 		this.memorySliderLabel.setText(this.memorySlider.getValue() + "Gb");
 		
@@ -108,19 +118,23 @@ public class LauncherSettings extends IScreen {
 		this.saveButton.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 16F));
 		this.saveButton.setPosition(190, 170);
 		this.saveButton.setSize(130, 35);
-		this.saveButton.setAction(eventAction -> {
-			pane.userConfig.writeConfig("" + this.memorySlider.getValue(), this.windowsSizeList.getValue());
-			Logger.log("" + this.memorySlider.getValue() + " " + this.windowsSizeList.getValue());
-			engine.reg(pane.userConfig.getMemory(this.memorySlider.getValue()));
-			engine.reg(pane.userConfig.getWindowSize(this.windowsSizeList.getValue()));
-			Stage stage = (Stage)((LauncherButton)eventAction.getSource()).getScene().getWindow();
-			stage.close();
+		this.saveButton.setOnAction(new EventHandler<ActionEvent>() {
+			
+			@Override
+			public void handle(ActionEvent event) {
+				pane.userConfig.writeConfig("" + memorySlider.getValue(), windowsSizeList.getValue());
+				Logger.log("" + memorySlider.getValue() + " " + windowsSizeList.getValue());
+				engine.reg(pane.userConfig.getMemory(memorySlider.getValue()));
+				engine.reg(pane.userConfig.getWindowSize(windowsSizeList.getValue()));
+				Stage stage = (Stage)((LauncherButton)event.getSource()).getScene().getWindow();
+				stage.close();
+			}
 		});
 	}
 
 	private void populateSizeList() {
-		for (GameSize ver : GameSize.values()) {
-			this.windowsSizeList.getItems().add(ver.getDesc());
+		for (GameSize size : GameSize.values()) {
+			this.windowsSizeList.getItems().add(size.getDesc());
 		}
 	}
 }
