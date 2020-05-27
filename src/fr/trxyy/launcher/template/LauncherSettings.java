@@ -13,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
@@ -28,6 +29,7 @@ public class LauncherSettings extends IScreen {
 	private Slider memorySlider;
 	private LauncherLabel windowsSizeLabel;
 	private ComboBox<String> windowsSizeList;
+	private CheckBox autoLogin;
 	
 	public LauncherSettings(final Pane root, final GameEngine engine, final LauncherPanel pane) {
 		this.drawBackgroundImage(engine, root, "background.png");
@@ -111,18 +113,28 @@ public class LauncherSettings extends IScreen {
 		
 		this.memorySliderLabel.setText(this.memorySlider.getValue() + "Gb");
 		
+		
+		this.autoLogin = new CheckBox();
+		this.autoLogin.setText("Connexion auto (crack)");
+		this.autoLogin.setSelected(pane.userConfig.getAutoLogin());
+		this.autoLogin.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 14F));
+		this.autoLogin.setStyle("-fx-text-fill: white;");
+		this.autoLogin.setLayoutX(50);
+		this.autoLogin.setLayoutY(180);
+		root.getChildren().add(autoLogin);
+		
 		/** ===================== BOUTON DE VALIDATION ===================== */
 		this.saveButton = new LauncherButton(root);
 		this.saveButton.setText("Valider");
 		this.saveButton.setStyle("-fx-background-color: rgba(53, 89, 119, 0.4); -fx-text-fill: white;");
 		this.saveButton.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 16F));
-		this.saveButton.setPosition(190, 170);
+		this.saveButton.setPosition(310, 170);
 		this.saveButton.setSize(130, 35);
 		this.saveButton.setOnAction(new EventHandler<ActionEvent>() {
 			
 			@Override
 			public void handle(ActionEvent event) {
-				pane.userConfig.writeConfig("" + memorySlider.getValue(), windowsSizeList.getValue());
+				pane.userConfig.writeConfig("" + memorySlider.getValue(), windowsSizeList.getValue(), isAutoLogin());
 				Logger.log("" + memorySlider.getValue() + " " + windowsSizeList.getValue());
 				engine.reg(pane.userConfig.getMemory(memorySlider.getValue()));
 				engine.reg(pane.userConfig.getWindowSize(windowsSizeList.getValue()));
@@ -135,6 +147,14 @@ public class LauncherSettings extends IScreen {
 	private void populateSizeList() {
 		for (GameSize size : GameSize.values()) {
 			this.windowsSizeList.getItems().add(size.getDesc());
+		}
+	}
+	
+	private String isAutoLogin() {
+		if (autoLogin.isSelected()) {
+			return "true";
+		} else {
+			return "false";
 		}
 	}
 }

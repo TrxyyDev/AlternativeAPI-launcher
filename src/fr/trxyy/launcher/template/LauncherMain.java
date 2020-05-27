@@ -2,7 +2,6 @@ package fr.trxyy.launcher.template;
 
 import fr.trxyy.alternative.alternative_api.GameEngine;
 import fr.trxyy.alternative.alternative_api.GameFolder;
-import fr.trxyy.alternative.alternative_api.GameForge;
 import fr.trxyy.alternative.alternative_api.GameLinks;
 import fr.trxyy.alternative.alternative_api.GameStyle;
 import fr.trxyy.alternative.alternative_api.GameVersion;
@@ -20,15 +19,13 @@ import javafx.stage.StageStyle;
 public class LauncherMain extends AlternativeBase {
 	private GameFolder gameFolder = new GameFolder("customlauncher");
 	private LauncherPreferences launcherPreferences = new LauncherPreferences("Launcher AlternativeAPI", 950, 600, true);
-	private GameEngine gameEngine = new GameEngine(gameFolder, launcherPreferences, GameVersion.V_1_15_2, GameStyle.VANILLA);
-	private GameLinks gameLinks = new GameLinks("http://monsite.fr/", "1.15.2.json");
-//	private GameForge gameForge = new GameForge("fmlclient", "31.1.0", "1.15.2", "net.minecraftforge", "20200122.131323");
+	private GameEngine gameEngine = new GameEngine(gameFolder, launcherPreferences, GameVersion.V_1_12_2, GameStyle.FORGE_1_8_TO_1_12_2);
+	private GameLinks gameLinks = new GameLinks("http://127.0.0.1/alternative/test/", "1.12.2.json");
 
 	public void start(Stage primaryStage) throws Exception {
 		Scene scene = new Scene(createContent());
 		this.gameEngine.reg(primaryStage);
 		this.gameEngine.reg(gameLinks);
-//		this.gameEngine.reg(this.gameForge);
 		LauncherBase launcher = new LauncherBase(primaryStage, scene, StageStyle.TRANSPARENT, gameEngine);
 		launcher.setIconImage(primaryStage, getResourceLocation().loadImage(gameEngine, "favicon.png"));
 	}

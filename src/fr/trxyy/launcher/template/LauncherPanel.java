@@ -1,6 +1,8 @@
 package fr.trxyy.launcher.template;
 
 import java.text.DecimalFormat;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fr.trxyy.alternative.alternative_api.GameEngine;
 import fr.trxyy.alternative.alternative_api.account.AccountType;
@@ -23,6 +25,7 @@ import fr.trxyy.alternative.alternative_api_ui.components.LauncherTextField;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -77,6 +80,11 @@ public class LauncherPanel extends IScreen {
 	private String YOUTUBE_URL = "http://youtube.com/c/Trxyy";
 	
 	private GameEngine theGameEngine;
+	
+	private Timer autoLoginTimer;
+	private LauncherLabel autoLoginLabel;
+	private LauncherRectangle autoLoginRectangle;
+	private LauncherButton autoLoginButton;
 
 	public LauncherPanel(Pane root, GameEngine engine) {
 		this.theGameEngine = engine;
@@ -92,8 +100,7 @@ public class LauncherPanel extends IScreen {
 		this.topRectangle.setFill(Color.rgb(0, 0, 0, 0.70));
 		this.topRectangle.setOpacity(1.0);
 		/** ===================== AFFICHER UN LOGO ===================== */
-		this.drawLogo(theGameEngine, getResourceLocation().loadImage(theGameEngine, "alternative_logo.png"),
-				theGameEngine.getWidth() / 2 - 165, 30, 330, 230, root, Mover.DONT_MOVE);
+		this.drawLogo(theGameEngine, getResourceLocation().loadImage(theGameEngine, "alternative_logo.png"), theGameEngine.getWidth() / 2 - 165, 30, 330, 230, root, Mover.DONT_MOVE);
 		/** ===================== ICONE BLOCK EN HAUT MILIEU ===================== */
 		this.titleImage = new LauncherImage(root);
 		this.titleImage.setImage(getResourceLocation().loadImage(theGameEngine, "favicon.png"));
@@ -175,8 +182,7 @@ public class LauncherPanel extends IScreen {
 					new LauncherAlert("Authentification echouee",
 							"Il y a un probleme lors de la tentative de connexion: Le pseudonyme doit comprendre au moins 3 caracteres.");
 				} else if (usernameField.getText().length() > 3 && passwordField.getText().isEmpty()) {
-					GameAuth auth = new GameAuth(usernameField.getText(), passwordField.getText(),
-							AccountType.OFFLINE);
+					GameAuth auth = new GameAuth(usernameField.getText(), passwordField.getText(), AccountType.OFFLINE);
 					if (auth.isLogged()) {
 						update(auth);
 					}
@@ -339,6 +345,72 @@ public class LauncherPanel extends IScreen {
 		this.bar.setPosition(theGameEngine.getWidth() / 2 - 125, theGameEngine.getHeight() / 2 + 60);
 		this.bar.setSize(250, 20);
 		this.bar.setVisible(false);
+		
+		/** =============== LOGIN AUTOMATIQUE (CRACK SEULEMENT) =============== **/
+		this.autoLoginRectangle = new LauncherRectangle(root, 0, theGameEngine.getHeight() - 32, 1000, theGameEngine.getHeight());
+		this.autoLoginRectangle.setFill(Color.rgb(0, 0, 0, 0.70));
+		this.autoLoginRectangle.setOpacity(1.0);
+		this.autoLoginRectangle.setVisible(false);
+		
+		this.autoLoginLabel = new LauncherLabel(root);
+		this.autoLoginLabel.setText("Connexion auto dans 3 secondes. Appuyez sur ECHAP pour annuler.");
+		this.autoLoginLabel.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 18F));
+		this.autoLoginLabel.setStyle("-fx-background-color: transparent; -fx-text-fill: red;");
+		this.autoLoginLabel.setPosition(theGameEngine.getWidth() / 2 - 280, theGameEngine.getHeight() - 34);
+		this.autoLoginLabel.setOpacity(0.7);
+		this.autoLoginLabel.setSize(700, 40);
+		this.autoLoginLabel.setVisible(false);
+		
+		this.autoLoginButton = new LauncherButton(root);
+		this.autoLoginButton.setText("Annuler");
+		this.autoLoginButton.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 14F));
+		this.autoLoginButton.setPosition(theGameEngine.getWidth() / 2 + 60, theGameEngine.getHeight() - 30);
+		this.autoLoginButton.setSize(200, 20);
+		this.autoLoginButton.setStyle("-fx-background-color: rgba(255, 255, 255, 0.4); -fx-text-fill: black;");
+		this.autoLoginButton.setVisible(false);
+		this.autoLoginButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				autoLoginTimer.cancel();
+				autoLoginLabel.setVisible(false);
+				autoLoginButton.setVisible(false);
+				autoLoginRectangle.setVisible(false);
+			}
+		});
+		
+		if (this.usernameSaver.getUsername().length() > 2 && !this.usernameSaver.getUsername().contains("@") && userConfig.getAutoLogin()) {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					autoLoginTimer = new Timer();
+					TimerTask timerTask = new TimerTask() {
+						int waitTime = 5;
+						int elapsed = 0;
+						@Override
+						public void run() {
+							elapsed++;
+
+							if (elapsed % waitTime == 0) {
+								loginButton.fire();
+								autoLoginTimer.cancel();
+							} else {
+								int time = (waitTime - (elapsed % waitTime));
+								Platform.runLater(new Runnable() {
+									@Override
+									public void run() {
+										autoLoginLabel.setText("Connexion auto dans " + time + " secondes.");
+									}
+								});
+							}
+						}
+					};
+					autoLoginTimer.schedule(timerTask, 0, 1000);
+					autoLoginLabel.setVisible(true);
+					autoLoginRectangle.setVisible(true);
+					autoLoginButton.setVisible(true);
+				}
+			});
+		}
 	}
 
 	private void update(GameAuth auth) {
