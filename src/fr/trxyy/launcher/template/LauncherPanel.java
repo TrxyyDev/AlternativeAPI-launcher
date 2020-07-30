@@ -41,24 +41,24 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class LauncherPanel extends IScreen {
-
+	/** TOP */
 	private LauncherRectangle topRectangle;
 	private LauncherRectangle backgroundWhiteRectangle;
 	private LauncherImage titleImage;
 	private LauncherLabel titleLabel;
 	private LauncherButton closeButton;
 	private LauncherButton reduceButton;
-
+	/** BUTTONS IMAGE URL */
 	private LauncherButton facebookButton;
 	private LauncherButton twitterButton;
 	private LauncherButton instagramButton;
 	private LauncherButton youtubeButton;
-
+	/** LOGIN */
 	private LauncherTextField usernameField;
 	private LauncherPasswordField passwordField;
 	private LauncherButton loginButton;
 	private LauncherButton settingsButton;
-
+	/** UPDATE */
 	public Timeline timeline;
 	private DecimalFormat decimalFormat = new DecimalFormat(".#");
 	private Thread updateThread;
@@ -68,19 +68,19 @@ public class LauncherPanel extends IScreen {
 	private LauncherLabel currentFileLabel;
 	private LauncherLabel percentageLabel;
 	private LauncherLabel currentStep;
-
+	/** USERNAME SAVER, CONFIG SAVER */
 	private UsernameSaver usernameSaver;
 	public UserConfig userConfig;
-	
+	/** PROGRESS BAR */
 	public LauncherProgressBar bar;
-
+	/** LINKS FOR BUTTONS IMAGES */
 	private String FACEBOOK_URL = "http://facebook.com/";
 	private String INSTAGRAM_URL = "http://instagram.com/";
 	private String TWITTER_URL = "http://twitter.com/";
 	private String YOUTUBE_URL = "http://youtube.com/c/Trxyy";
-	
+	/** GAMEENGINE REQUIRED */
 	private GameEngine theGameEngine;
-	
+	/** AUTO LOGIN */
 	private Timer autoLoginTimer;
 	private LauncherLabel autoLoginLabel;
 	private LauncherRectangle autoLoginRectangle;
@@ -393,6 +393,9 @@ public class LauncherPanel extends IScreen {
 							if (elapsed % waitTime == 0) {
 								loginButton.fire();
 								autoLoginTimer.cancel();
+								autoLoginLabel.setVisible(false);
+								autoLoginButton.setVisible(false);
+								autoLoginRectangle.setVisible(false);
 							} else {
 								int time = (waitTime - (elapsed % waitTime));
 								Platform.runLater(new Runnable() {

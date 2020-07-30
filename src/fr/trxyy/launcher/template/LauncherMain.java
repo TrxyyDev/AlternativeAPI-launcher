@@ -18,9 +18,9 @@ import javafx.stage.StageStyle;
 
 public class LauncherMain extends AlternativeBase {
 	private GameFolder gameFolder = new GameFolder("customlauncher");
-	private LauncherPreferences launcherPreferences = new LauncherPreferences("Launcher AlternativeAPI", 950, 600, true);
-	private GameEngine gameEngine = new GameEngine(gameFolder, launcherPreferences, GameVersion.V_1_12_2, GameStyle.FORGE_1_8_TO_1_12_2);
-	private GameLinks gameLinks = new GameLinks("http://127.0.0.1/alternative/test/", "1.12.2.json");
+	private LauncherPreferences launcherPreferences = new LauncherPreferences("Launcher Template AlternativeAPI", 950, 600, true);
+	private GameEngine gameEngine = new GameEngine(gameFolder, launcherPreferences, GameVersion.V_1_16_1, GameStyle.VANILLA);
+	private GameLinks gameLinks = new GameLinks("http://127.0.0.1/alternative/1_16_1/", "1.16.1.json");
 
 	public void start(Stage primaryStage) throws Exception {
 		Scene scene = new Scene(createContent());
