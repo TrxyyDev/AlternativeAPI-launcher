@@ -5,13 +5,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.trxyy.alternative.alternative_api.GameEngine;
+import fr.trxyy.alternative.alternative_api.GameMemory;
+import fr.trxyy.alternative.alternative_api.GameSize;
+import fr.trxyy.alternative.alternative_api.JVMArguments;
 import fr.trxyy.alternative.alternative_api.account.AccountType;
 import fr.trxyy.alternative.alternative_api.auth.GameAuth;
 import fr.trxyy.alternative.alternative_api.updater.GameUpdater;
 import fr.trxyy.alternative.alternative_api.utils.FontLoader;
 import fr.trxyy.alternative.alternative_api.utils.Mover;
-import fr.trxyy.alternative.alternative_api.utils.config.UserConfig;
-import fr.trxyy.alternative.alternative_api.utils.config.UsernameSaver;
+import fr.trxyy.alternative.alternative_api.utils.config.LauncherConfig;
 import fr.trxyy.alternative.alternative_api_ui.LauncherAlert;
 import fr.trxyy.alternative.alternative_api_ui.LauncherPane;
 import fr.trxyy.alternative.alternative_api_ui.base.IScreen;
@@ -69,8 +71,6 @@ public class LauncherPanel extends IScreen {
 	private LauncherLabel percentageLabel;
 	private LauncherLabel currentStep;
 	/** USERNAME SAVER, CONFIG SAVER */
-	private UsernameSaver usernameSaver;
-	public UserConfig userConfig;
 	/** PROGRESS BAR */
 	public LauncherProgressBar bar;
 	/** LINKS FOR BUTTONS IMAGES */
@@ -85,13 +85,15 @@ public class LauncherPanel extends IScreen {
 	private LauncherLabel autoLoginLabel;
 	private LauncherRectangle autoLoginRectangle;
 	private LauncherButton autoLoginButton;
+	
+	public LauncherConfig config;
 
 	public LauncherPanel(Pane root, GameEngine engine) {
 		this.theGameEngine = engine;
-		/** ===================== CONFIGURATION UTILISATEUR ===================== */
-		this.userConfig = new UserConfig(theGameEngine);
-		/** ===================== RECTANGLE NOIR EN HAUT ===================== */
-		this.usernameSaver = new UsernameSaver(theGameEngine);
+		this.config = new LauncherConfig(engine);
+		this.config.loadConfiguration();
+		
+//		this.drawBackgroundImage(theGameEngine, root, "background.png");
 		/** ===================== RECTANGLE NOIR EN HAUT ===================== */
 		this.backgroundWhiteRectangle = new LauncherRectangle(root, 0, 0, theGameEngine.getWidth(), theGameEngine.getHeight());
 		this.backgroundWhiteRectangle.setFill(Color.rgb(255, 255, 255, 0.17));
@@ -125,7 +127,6 @@ public class LauncherPanel extends IScreen {
 		this.closeButton.setGraphic(closeImage);
 		this.closeButton.setOnAction(new EventHandler<ActionEvent>() {
 			
-			@Override
 			public void handle(ActionEvent event) {
 				System.exit(0);
 			}
@@ -141,7 +142,6 @@ public class LauncherPanel extends IScreen {
 		this.reduceButton.setGraphic(reduceImage);
 		this.reduceButton.setOnAction(new EventHandler<ActionEvent>() {
 			
-			@Override
 			public void handle(ActionEvent event) {
 				Stage stage = (Stage) ((LauncherButton) event.getSource()).getScene().getWindow();
 				stage.setIconified(true);
@@ -150,7 +150,7 @@ public class LauncherPanel extends IScreen {
 		});
 		/** ===================== CASE PSEUDONYME ===================== */
 		this.usernameField = new LauncherTextField(root);
-		this.usernameField.setText(this.usernameSaver.getUsername());
+		this.usernameField.setText((String)this.config.getValue("username"));
 		this.usernameField.setPosition(theGameEngine.getWidth() / 2 - 135, theGameEngine.getHeight() / 2 - 57);
 		this.usernameField.setSize(270, 50);
 		this.usernameField.setFont(FontLoader.loadFont("Comfortaa-Regular.ttf", "Comfortaa", 14F));
@@ -172,9 +172,8 @@ public class LauncherPanel extends IScreen {
 		this.loginButton.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4); -fx-text-fill: white;");
 		this.loginButton.setOnAction(new EventHandler<ActionEvent>() {
 			
-			@Override
 			public void handle(ActionEvent event) {
-				usernameSaver.writeUsername(usernameField.getText());
+				config.updateValue("username", usernameField.getText());
 				/**
 				 * ===================== AUTHENTIFICATION OFFLINE (CRACK) =====================
 				 */
@@ -216,7 +215,6 @@ public class LauncherPanel extends IScreen {
 		this.settingsButton.setPosition(theGameEngine.getWidth() / 2 - 135, theGameEngine.getHeight() / 2 + 60);
 		this.settingsButton.setSize(60, 45);
 		this.settingsButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				Scene scene = new Scene(createSettingsPanel());
 				Stage stage = new Stage();
@@ -225,7 +223,7 @@ public class LauncherPanel extends IScreen {
 				stage.initStyle(StageStyle.TRANSPARENT);
 				stage.setTitle("Parametres Launcher");
 				stage.setWidth(500);
-				stage.setHeight(230);
+				stage.setHeight(300);
 				stage.setScene(scene);
 				stage.initModality(Modality.APPLICATION_MODAL);
 				stage.showAndWait();
@@ -241,7 +239,6 @@ public class LauncherPanel extends IScreen {
 		this.facebookButton.setSize((int) facebookImg.getFitWidth(), (int) facebookImg.getFitHeight());
 		this.facebookButton.setBackground(null);
 		this.facebookButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				openLink(FACEBOOK_URL);
 			}
@@ -256,7 +253,6 @@ public class LauncherPanel extends IScreen {
 		this.twitterButton.setSize((int) twitterImg.getFitWidth(), (int) twitterImg.getFitHeight());
 		this.twitterButton.setBackground(null);
 		this.twitterButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				openLink(TWITTER_URL);
 			}
@@ -271,7 +267,6 @@ public class LauncherPanel extends IScreen {
 		this.instagramButton.setSize((int) instagramImg.getFitWidth(), (int) instagramImg.getFitHeight());
 		this.instagramButton.setBackground(null);
 		this.instagramButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				openLink(INSTAGRAM_URL);
 			}
@@ -286,7 +281,6 @@ public class LauncherPanel extends IScreen {
 		this.youtubeButton.setSize((int) youtubeImg.getFitWidth(), (int) youtubeImg.getFitHeight());
 		this.youtubeButton.setBackground(null);
 		this.youtubeButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				openLink(YOUTUBE_URL);
 			}
@@ -369,7 +363,6 @@ public class LauncherPanel extends IScreen {
 		this.autoLoginButton.setStyle("-fx-background-color: rgba(255, 255, 255, 0.4); -fx-text-fill: black;");
 		this.autoLoginButton.setVisible(false);
 		this.autoLoginButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
 			public void handle(ActionEvent event) {
 				autoLoginTimer.cancel();
 				autoLoginLabel.setVisible(false);
@@ -377,10 +370,9 @@ public class LauncherPanel extends IScreen {
 				autoLoginRectangle.setVisible(false);
 			}
 		});
-		
-		if (this.usernameSaver.getUsername().length() > 2 && !this.usernameSaver.getUsername().contains("@") && userConfig.getAutoLogin()) {
+		String userName = (String)this.config.getValue("username");
+		if (userName.length() > 2 && !userName.contains("@") && (boolean)this.config.getValue("autologin").equals(true)) {
 			Platform.runLater(new Runnable() {
-				@Override
 				public void run() {
 					autoLoginTimer = new Timer();
 					TimerTask timerTask = new TimerTask() {
@@ -391,15 +383,16 @@ public class LauncherPanel extends IScreen {
 							elapsed++;
 
 							if (elapsed % waitTime == 0) {
-								loginButton.fire();
-								autoLoginTimer.cancel();
-								autoLoginLabel.setVisible(false);
-								autoLoginButton.setVisible(false);
-								autoLoginRectangle.setVisible(false);
+								if (!theGameEngine.getGameMaintenance().isAccessBlocked()) {
+									loginButton.fire();
+									autoLoginTimer.cancel();
+									autoLoginLabel.setVisible(false);
+									autoLoginButton.setVisible(false);
+									autoLoginRectangle.setVisible(false);
+								}
 							} else {
-								int time = (waitTime - (elapsed % waitTime));
+								final int time = (waitTime - (elapsed % waitTime));
 								Platform.runLater(new Runnable() {
-									@Override
 									public void run() {
 										autoLoginLabel.setText("Connexion auto dans " + time + " secondes.");
 									}
@@ -431,9 +424,25 @@ public class LauncherPanel extends IScreen {
 		this.currentFileLabel.setVisible(true);
 		this.percentageLabel.setVisible(true);
 		this.bar.setVisible(true);
-		updater.reg(theGameEngine);
-		updater.reg(auth.getSession());
-		theGameEngine.reg(this.updater);
+		this.updater.reg(theGameEngine);
+		this.updater.reg(auth.getSession());
+		/**
+		 * Change settings in GameEngine from launcher_config.json
+		 */
+		this.theGameEngine.reg(GameMemory.getMemory(Double.parseDouble((String) this.config.getValue("allocatedram"))));
+		this.theGameEngine.reg(GameSize.getWindowSize(Integer.parseInt((String) this.config.getValue("gamesize"))));
+		boolean useVmArgs = (Boolean)config.getValue("usevmarguments");
+		String vmArgs = (String) config.getValue("vmarguments");
+		String[] s = null;
+		if (useVmArgs) {
+			if (vmArgs.length() > 3) {
+				s = vmArgs.split(" ");
+			}
+			JVMArguments arguments = new JVMArguments(s);
+			this.theGameEngine.reg(arguments);
+		}
+		/** END */
+		this.theGameEngine.reg(this.updater);
 		this.updateThread = new Thread() {
 			public void run() {
 				theGameEngine.getGameUpdater().run();
@@ -443,7 +452,6 @@ public class LauncherPanel extends IScreen {
 		/** ===================== REFAICHIR LE NOM DU FICHIER, PROGRESSBAR, POURCENTAGE  ===================== **/
 		this.timeline = new Timeline(
 				new KeyFrame[] { new KeyFrame(javafx.util.Duration.seconds(0.0D), new EventHandler<ActionEvent>() {
-					@Override
 					public void handle(ActionEvent event) {
 						timelineUpdate(theGameEngine);
 					}
@@ -455,7 +463,7 @@ public class LauncherPanel extends IScreen {
 
 	private Parent createSettingsPanel() {
 		LauncherPane contentPane = new LauncherPane(theGameEngine);
-		Rectangle rect = new Rectangle(500, 230);
+		Rectangle rect = new Rectangle(500, 300);
 		rect.setArcHeight(15.0);
 		rect.setArcWidth(15.0);
 		contentPane.setClip(rect);
