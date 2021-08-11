@@ -6,6 +6,8 @@ import fr.trxyy.alternative.alternative_api.GameForge;
 import fr.trxyy.alternative.alternative_api.GameLinks;
 import fr.trxyy.alternative.alternative_api.GameStyle;
 import fr.trxyy.alternative.alternative_api.LauncherPreferences;
+import fr.trxyy.alternative.alternative_api.utils.Forge;
+import fr.trxyy.alternative.alternative_api.utils.Mover;
 import fr.trxyy.alternative.alternative_api_ui.LauncherBackground;
 import fr.trxyy.alternative.alternative_api_ui.LauncherPane;
 import fr.trxyy.alternative.alternative_api_ui.base.AlternativeBase;
@@ -19,17 +21,17 @@ import javafx.stage.StageStyle;
 
 public class LauncherMain extends AlternativeBase {
 	private GameFolder gameFolder = new GameFolder("customlauncher");
-	private LauncherPreferences launcherPreferences = new LauncherPreferences("Launcher Template AlternativeAPI", 950, 600, true);
+	private LauncherPreferences launcherPreferences = new LauncherPreferences("Launcher Template AlternativeAPI", 950, 600, Mover.MOVE);
 	private GameLinks gameLinks = new GameLinks("http://127.0.0.1/alternative/1_16_3/", "1.16.3.json");
 	private GameEngine gameEngine = new GameEngine(this.gameFolder, this.gameLinks, this.launcherPreferences, GameStyle.FORGE_1_13_HIGHER);
-	private GameForge newForge = new GameForge("fmlclient", "34.1.0", "1.16.3", "net.minecraftforge", "20200911.084530");
+	private GameForge newForge = new GameForge(Forge.DEFAULT, "1.16.3", "34.1.0", "20200911.084530");
 
 	public void start(Stage primaryStage) throws Exception {
 		Scene scene = new Scene(createContent());
 		this.gameEngine.reg(primaryStage);
 		this.gameEngine.reg(this.newForge);
 		LauncherBase launcher = new LauncherBase(primaryStage, scene, StageStyle.TRANSPARENT, this.gameEngine);
-		launcher.setIconImage(primaryStage, getResourceLocation().loadImage(this.gameEngine, "favicon.png"));
+		launcher.setIconImage(primaryStage, "favicon.png");
 	}
 
 	private Parent createContent() {
@@ -39,7 +41,7 @@ public class LauncherMain extends AlternativeBase {
 		rect.setArcWidth(15.0);
 		contentPane.setClip(rect);
 		contentPane.setStyle("-fx-background-color: transparent;");
-		new LauncherBackground(this.gameEngine, getResourceLocation().getMedia(this.gameEngine, "background.mp4"), contentPane);
+		new LauncherBackground(this.gameEngine, "background.mp4", contentPane);
 		new LauncherPanel(contentPane, this.gameEngine);
 		return contentPane;
 	}
