@@ -2,9 +2,11 @@ package fr.trxyy.launcher.template;
 
 import fr.trxyy.alternative.alternative_api.GameEngine;
 import fr.trxyy.alternative.alternative_api.GameFolder;
+import fr.trxyy.alternative.alternative_api.GameForge;
 import fr.trxyy.alternative.alternative_api.GameLinks;
 import fr.trxyy.alternative.alternative_api.GameStyle;
 import fr.trxyy.alternative.alternative_api.LauncherPreferences;
+import fr.trxyy.alternative.alternative_api.utils.Forge;
 import fr.trxyy.alternative.alternative_api.utils.Logger;
 import fr.trxyy.alternative.alternative_api.utils.Mover;
 import fr.trxyy.alternative.alternative_api.utils.WindowStyle;
@@ -20,8 +22,8 @@ import javafx.stage.StageStyle;
 
 public class LauncherMain extends AlternativeBase {
 	private GameFolder GAME_FOLDER = new GameFolder("customlauncher");
-	private GameLinks GAME_LINKS = new GameLinks("http://localhost/alternative/1_17_1/", "1.17.1.json");
-//	private GameForge GAME_FORGE = new GameForge(Forge.DEFAULT, "1.16.3",  "34.1.0", "20200911.084530");
+	private GameLinks GAME_LINKS = new GameLinks("http://localhost/alternative/1_18_1/", "1.18.1.json");
+//	private GameForge GAME_FORGE = new GameForge(Forge.FORGE_CLIENT, "1.18",  "38.0.17", "20211130.085255");
 	private LauncherPreferences LAUNCHER_PREFERENCES = new LauncherPreferences("Launcher Template AlternativeAPI v2", 880, 520, Mover.MOVE);
 	private GameEngine GAME_ENGINE = new GameEngine(this.GAME_FOLDER, this.GAME_LINKS, this.LAUNCHER_PREFERENCES, GameStyle.VANILLA/*, this.GAME_FORGE*/);
 
@@ -39,7 +41,7 @@ public class LauncherMain extends AlternativeBase {
 	}
 	
 	public static void main(String[] args) {
-		Logger.log("Launching the super App ! Hello Github :)");
+		Logger.log("Hello World ! :)");
 		Application.launch(args);
 	}
 }
